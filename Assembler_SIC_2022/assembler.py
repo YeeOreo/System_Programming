@@ -17,10 +17,10 @@ def processBYTEC(operand):
     return constant
 
 def generateInstruction(opcode, operand, SYMTAB):
-    instruction = int(sic.OPTAB[opcode] * 65536)
+    instruction = int(sic.OPTAB[opcode] * 65536) # opcode 需往左邊移動15格
     if operand != None:
-        if operand[len(operand)-2:] == ',X':
-            instruction += 32768
+        if operand[len(operand)-2:] == ',X': # 如果operand最後2格是「,X」
+            instruction += 32768 # 在instruction第15個bit set 1
             operand = operand[:len(operand)-2]
         if operand in SYMTAB:
             instruction += int(SYMTAB[operand])
@@ -29,7 +29,8 @@ def generateInstruction(opcode, operand, SYMTAB):
     return objfile.hexstrToWord(hex(instruction))
 
 
-if len(sys.argv) != 2:
+if len(sys.argv) != 2: # 在Terimal 傳入的參數不等於 2(argv為在傳入本python檔案的參數之list，第1個是本程式名稱，第2個是在Terimal輸入的參數)
+    # len(sys.argv)即傳回argv的list參數個數，等同C、C++、Java的int argc
     print("Usage: python3 assembler.py <source file>")
     sys.exit()
     

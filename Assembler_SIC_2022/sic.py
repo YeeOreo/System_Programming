@@ -29,7 +29,7 @@ OPTAB = {
     "TIX":  0x2C,
     "WD":   0xDC
 }
-
+# pseudo instruction
 DIRECTIVE = [
     "START",
     "END",

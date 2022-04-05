@@ -48,10 +48,10 @@ def writeEnd(file, address):
     file.close()
     
 def hexstrToWord(hexstr):
-    hexstr = hexstr.upper()
-    hexstr = hexstr[2:]
-    n = 6 - len(hexstr)
-    for i in range(0, n):
+    hexstr = hexstr.upper() #將全部英文字母變成大寫
+    hexstr = hexstr[2:] #將16進位開頭的「0x」字首去掉
+    n = 6 - len(hexstr) #最多補六個0
+    for i in range(0, n): #補0
         hexstr = '0' + hexstr    
     return hexstr
 

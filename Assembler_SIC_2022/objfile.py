@@ -22,14 +22,14 @@ def writeHeader(file, name, starting, proglen):
     file.write(header)
     
 def programname(name):
-    n = 6 - len(name)
-    for i in range(0, n):
+    n = 6 - len(name)      #Head Record最多只有7 bits
+    for i in range(0, n):  #空白的一律在後面補空白
         name = name + ' '
     return name
 
 def writeText(file, starting, tline):
     textrecord = "T" + hexstrToWord(hex(starting))
-    l = hex(int(len(tline)/2))
+    l = hex(int(len(tline)/2))  #1個指令以機器碼表示有1 byte，(Object File為TEXText格式)TEXT長度為將ASCII(1 byte)長度調整為16進位格式(0.5 byte)
     l = l[2:]
     
     n = 2 - len(l)

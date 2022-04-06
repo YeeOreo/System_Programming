@@ -21,7 +21,7 @@ def generateInstruction(opcode, operand, SYMTAB):
     if operand != None:
         if operand[len(operand)-2:] == ',X': # 如果operand最後2格是「,X」
             instruction += 32768 # 在instruction第15個bit set 1
-            operand = operand[:len(operand)-2]
+            operand = operand[:len(operand)-2] # 將「,X」去掉，存入operand
         if operand in SYMTAB:
             instruction += int(SYMTAB[operand])
         else:
@@ -39,6 +39,9 @@ lines = sicasmparser.readfile(sys.argv[1])
 SYMTAB = {}
 
 # PASS 1
+"""
+製造SYMTAB(Symbol Table)、紀錄整份程式檔案(由LOCCTR(Location Counter)計算)之長度(bytes)
+"""
 for line in lines:
     t = sicasmparser.decompositLine(line)
 
@@ -54,43 +57,45 @@ for line in lines:
         break
     
     if t[0] != None:
-        if t[0] in SYMTAB:
+        if t[0] in SYMTAB:  # 重複的labels
             print("Your assembly code has problem.")
             continue
-        SYMTAB[t[0]] = LOCCTR
+        SYMTAB[t[0]] = LOCCTR   
     
     if sic.isInstruction(t[1]) == True:
+        LOCCTR = LOCCTR + 3                 # 每一個指令長3 bytes
+    elif t[1] == "WORD":    # 1 word = 3 bytes
         LOCCTR = LOCCTR + 3
-    elif t[1] == "WORD":
-        LOCCTR = LOCCTR + 3
-    elif t[1] == "RESW":
+    elif t[1] == "RESW":    # RESERVE the indicated number of words for a data area | 以word(1 word = 3 bytes)為單位保留記憶體空間
         LOCCTR = LOCCTR + (int(t[2])*3)
-    elif t[1] == "RESB":
+    elif t[1] == "RESB":    # Reserve the indicated number of bytes for a data area | 以byte為單位保留記憶體空間
         LOCCTR = LOCCTR + int(t[2])
-    elif t[1] == "BYTE":
+    elif t[1] == "BYTE": 
         if t[2][0] == 'C':
-            LOCCTR = LOCCTR + (len(t[2]) - 3)
+            LOCCTR = LOCCTR + (len(t[2]) - 3) # 「C」 不算
         if t[2][0] == 'X':
-            LOCCTR = LOCCTR + ((len(t[2]) - 3)/2)
+            LOCCTR = LOCCTR + ((len(t[2]) - 3)/2) # 
         
 
 print(SYMTAB)
 
 # PASS 2
-
-reserveflag = False
+"""
+依照SYMTAB建造Object File
+"""
+reserveflag = False # 執行Reserve 記憶體空間的指令時，flag 設為 True
 
 t = sicasmparser.decompositLine(lines[0])
     
-file = objfile.openFile(sys.argv[1])
+file = objfile.openFile(sys.argv[1]) #argv list的第2個參數即為檔案
 
 LOCCTR = 0
 if t[1] == "START":
-    LOCCTR = int(t[2], 16)
+    LOCCTR = int(t[2], 16)  # 將t[2]的內容(數字)以16進位的基底轉成10進位的integer
     progname = t[0]
 STARTING = LOCCTR
 
-objfile.writeHeader(file, progname, STARTING, proglen)
+objfile.writeHeader(file, progname, STARTING, proglen)  # 寫入Object File的Head Record
 
 tline = ""
 tstart = LOCCTR
@@ -108,7 +113,7 @@ for line in lines:
     if t[1] == "END":
 
         if len(tline) > 0:
-            objfile.writeText(file, tstart, tline)
+            objfile.writeText(file, tstart, tline)  # 寫入Object File的Text Record
             
         PROGLEN = LOCCTR - STARTING
 
@@ -116,7 +121,7 @@ for line in lines:
         if t[2] != None:
             address = SYMTAB[t[2]]
             
-        objfile.writeEnd(file, address)
+        objfile.writeEnd(file, address) # 寫入Object File的End Record
         break
 
                     
@@ -124,8 +129,8 @@ for line in lines:
 
         instruction = generateInstruction(t[1], t[2], SYMTAB)
         
-        if len(instruction) == 0:
-            print("Undefined Symbole: %s" % t[2])
+        if len(instruction) == 0: # 指令錯誤時，函式傳回空值
+            print("Undefined Symbols: %s" % t[2]) # 指令錯誤
             break
 
         if (LOCCTR + 3 - tstart > 30) or (reserveflag == True):

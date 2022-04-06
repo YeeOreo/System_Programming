@@ -10,7 +10,7 @@ def readfile(srcfile):
 def decompositLine(line):
 
     if len(line) > 0:
-        if line[0] == '.':
+        if line[0] == '.':      # 以「.」作為註解符號
             return (None, None, None)
         if line[0] == '\n':
             return (None, None, None)

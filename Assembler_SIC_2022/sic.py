@@ -29,22 +29,22 @@ OPTAB = {
     "TIX":  0x2C,
     "WD":   0xDC
 }
-# pseudo instruction
+# pseudo instruction 假指令，沒有被CPU真正執行的指令，只是用來告訴Assembler做事的指令
 DIRECTIVE = [
     "START",
     "END",
     "WORD",
-    "BYTE",
-    "RESW",
-    "RESB"
+    "BYTE", 
+    "RESW",# Reserve Word：叫Assembler在Ojject file中保留1 word(3 bytes)的空間
+    "RESB" # Reserve Byte：叫Assembler在Object file中保留1 byte的空間
 ]
-
+# 假指令
 def isDirective(token):
     if token in DIRECTIVE:
         return True
     else:
         return False
-
+# 指令
 def isInstruction(token):
     if token in OPTAB:
         return True

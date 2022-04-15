@@ -204,12 +204,12 @@ for line in lines:
             # 因此2個16進位字元「除2」 = 1 bytes
             constant = t[2][2:len(t[2])-1] # 去除「X」前面的「'」、最後的「'」
         elif t[2][0] == 'C': # 以ASCII code表示的字元，1個ASCII code字元為1 byte
-            """下面兩行為換新的一行處理的動作"""
             operandlen = int(len(t[2]) - 3) #operand去掉「C」、「'」*2個剩下的bytes數   
             constant = processBYTEC(t[2]) # processBYTEC函數會去除「C」、「'」轉換為16進位字元後視情況補0
-            
-        if (LOCCTR + 3 - tstart > 30) or (reserveflag == True):
+        """處理流程與上方的一般指令相同"""    
+        if (LOCCTR + 3 - tstart > 30) or (reserveflag == True):    
             objfile.writeText(file, tstart, tline)
+            """下面兩行為換新的一行處理的動作"""
             tstart = LOCCTR # 新一行Text Record機器碼的Starting Address
             tline = constant # 新一行Text Record的指令機器碼
         else:
